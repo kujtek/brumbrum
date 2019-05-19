@@ -5,6 +5,8 @@
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
 #include <windows.h>
+#include <SDL2/SDL_ttf.h>
+#include <sstream>
 
 
 using namespace std;
@@ -27,7 +29,7 @@ SDL_Texture* loadTexture( std::string path )
     SDL_Surface* loadedSurface = IMG_Load( path.c_str() );
     if( loadedSurface == NULL )
     {
-        SDL_Log( "Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError() );
+         //SDL_Log( "Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError() );
     }
     else
     {
@@ -35,7 +37,7 @@ SDL_Texture* loadTexture( std::string path )
         newTexture = SDL_CreateTextureFromSurface( render, loadedSurface );
         if( newTexture == NULL )
         {
-            SDL_Log( "Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
+            //SDL_Log( "Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
         }
 
         //Get rid of old loaded surface
@@ -53,10 +55,21 @@ int main(int argc, char*args[])
  render = SDL_CreateRenderer(okno,-1,SDL_RENDERER_ACCELERATED);
 
  klasa_fps fps;
+
+ TTF_Init();
+
+ TTF_Font * arial = TTF_OpenFont("C:/Windows/Fonts/Arial.ttf",40);
+
+
+ SDL_Surface * surface_tekst;
+ SDL_Texture * texture_tekst;
+
  int klatka=0;
 
  float posY = 360;
  float velY = 0;
+
+ int punkty=0;
 
  vector < klasa_przeciwnik > v_przeciwnik;
        SDL_Texture*droga=loadTexture("GRAFIKA/tlo.bmp");
@@ -68,7 +81,7 @@ int main(int argc, char*args[])
     fps.start();
     klatka++;
     keystate = SDL_GetKeyboardState(NULL);
-    {
+
 
 
         {//zdarzenie
@@ -78,6 +91,20 @@ int main(int argc, char*args[])
                 {
                     exit(0);
                 }
+            }
+            {//wydarzenie
+                if(klatka%10==0)
+                {
+                    punkty=punkty+1;
+                }
+                if(velY<1&&velY>-1)
+                {
+                    if(klatka%3==0)
+                    {
+                        punkty=punkty+1;
+                    }
+                }
+
             }
             {//sapwn samochody
                 if(klatka%20 == 0)
@@ -92,6 +119,7 @@ int main(int argc, char*args[])
                     {
                        //v_przeciwnik(loop).pop_back();
                     }
+
                 }
             }
             {//sterowanie
@@ -156,12 +184,30 @@ int main(int argc, char*args[])
                     v_przeciwnik.at(loop).update(przeciwnik,posY);
                 }
             }
+            {//tekst
+                SDL_Color kolor = {255,255,255};
+                stringstream ss;
+                ss<<punkty;
+
+                surface_tekst = TTF_RenderText_Blended(arial,ss.str().c_str(),kolor);
+
+                texture_tekst = SDL_CreateTextureFromSurface(render,surface_tekst);
+
+                rect2.x=0;rect2.y=0;rect2.w=200;rect2.h=100;
+
+                SDL_RenderCopy(render,texture_tekst,NULL,&rect2);
+
+                SDL_DestroyTexture(texture_tekst);
+                SDL_FreeSurface(surface_tekst);
+
+
+            }
            }
         }
         SDL_RenderPresent(render);
         fps.end();
         }
-    }
+
  }
 }
 
