@@ -64,7 +64,7 @@ int main(int argc, char*args[])
  SDL_Surface * surface_tekst;
  SDL_Texture * texture_tekst;
 
- int klatka=0;
+ int klatka=0, poziom = 60;
 
  float posY = 360;
  float velY = 0;
@@ -107,12 +107,14 @@ int main(int argc, char*args[])
 
             }
             {//sapwn samochody
-                if(klatka%20 == 0)
+                if(klatka%poziom == 0)
                 {
                     klasa_przeciwnik obj;
                     obj.init();
                     v_przeciwnik.push_back(obj);
                 }
+
+
                 for(int loop=0;loop<v_przeciwnik.size();loop++)
                 {
                     if(v_przeciwnik.at(loop).aktywny==false)
@@ -202,6 +204,17 @@ int main(int argc, char*args[])
 
 
             }
+            if(punkty % 500 == 0)
+            {
+                poziom=poziom-3;
+            }
+             if(velY<1&&velY>-1)
+                {
+                    if(poziom%3==0)
+                    {
+                        poziom=poziom+1;
+                    }
+                }
            }
         }
         SDL_RenderPresent(render);
